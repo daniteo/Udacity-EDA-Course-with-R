@@ -1,0 +1,78 @@
+# Multiple Variable Analisys Exercise
+
+## Working with diamonds dataset
+
+### Diamonds price histogram by color
+
+```{r}
+library(ggplot2)
+
+data(diamonds)
+ggplot(aes(x = price, fill = cut), data = diamonds)+
+  facet_wrap( ~ color )+
+  scale_x_log10()+
+  geom_histogram()+
+  scale_fill_brewer(type = 'qual')
+```
+
+### Price vs Table Scatter
+
+```{r}
+ggplot(aes(x = table, y = price,color = cut), data = diamonds)+
+  geom_point()+
+  scale_x_continuous(limits= c(50,80), breaks = seq(50, 80, 2))+
+  scale_color_brewer(type = 'qual')
+```
+
+### Diamond volume vs price
+
+```{r}
+diamonds$volume <- diamonds$x*diamonds$y*diamonds$z
+summary(diamonds$volume)
+ggplot(aes(y=price, x=volume, color=clarity), 
+       data=subset(diamonds, volume<=quantile(volume, 0.99)))+
+  geom_point()+
+  scale_y_log10()+
+  scale_color_brewer(type = 'div')
+```
+
+## Facebook dataset
+
+### Friendship initiated vs Tenure
+
+```{r}
+pf <- read.delim('pseudo_facebook.tsv')
+str(pf)
+pf$prop_initiated <- pf$friendships_initiated/pf$friend_count
+summary(pf$prop_initiated)
+```
+```{r}
+pf$year_joined <- floor(2014 - pf$tenure / 365)
+pf$year_joined.bucket <- cut(x=pf$year_joined, breaks = c(2004,2009,2011,2012,2014))
+summary(pf$tenure)
+table(pf$prop_initiated)
+
+ggplot(aes(y = prop_initiated, x=tenure, color=year_joined.bucket), 
+       data=subset(pf, !is.na(prop_initiated) & !is.na(year_joined.bucket)))+
+  geom_line(stat = 'summary', fun.y = median)
+```
+
+### Friendship initiated vs Tenure - Smooth
+
+```{r}
+ggplot(aes(y = prop_initiated, x=tenure, color=year_joined.bucket), 
+       data=subset(pf, !is.na(prop_initiated) & !is.na(year_joined.bucket)))+
+  geom_smooth()
+```
+
+```{r}
+by(pf$prop_initiated, pf$year_joined.bucket, summary)
+```
+
+## Back to diamonds dataset
+
+### Price/carat ratio
+
+```{r}
+
+```
