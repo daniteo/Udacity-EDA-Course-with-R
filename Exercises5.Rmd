@@ -84,4 +84,55 @@ ggplot(aes(y=price/carat, x=cut, color=color), data=diamonds)+
 ## 
 
 ```{r}
+require(xlsx)
+library('tidyr')
+library('dplyr')
+
+dados <- array(c('Indicator_TC male ASM.xlsx','M','TC',
+                 'Indicator_TC female ASM.xlsx','F','TC',
+                 'Indicator_BMI male ASM.xlsx','M','BMI',
+                 'Indicator_BMI female ASM.xlsx','F','BMI',
+                 'Indicator_SBP male ASM.xlsx','M','SBP',
+                 'Indicator_SBP female ASM.xlsx','F','SBP'), dim=c(3,6,2))
+
+print(dados)
+
+#health_risk <- read.xlsx('Indicator_TC male ASM.xlsx', sheetIndex = 1, check.names = F)
+#health_risk$gender <- 'M'
+#health_risk$indicator <- 'TC'
+#names(health_risk)[1] <- "country"
+
+rm(health_risk)
+rm(health_risk_tmp)
+
+for (i in 1:6) {
+  print(dados[3*(i-1)+1])
+  print(dados[3*(i-1)+2])
+  print(dados[3*(i-1)+3])
+  
+  
+  if (!exists("health_risk")) {
+    
+    health_risk <- read.xlsx(dados[3*(i-1)+1], sheetIndex = 1, check.names = F)
+    health_risk$gender <- dados[3*(i-1)+2]
+    health_risk$indicator <- dados[3*(i-1)+3]
+    names(health_risk)[1] <- "country"
+    
+  } else {
+    health_risk_tmp <- read.xlsx(dados[3*(i-1)+1], sheetIndex = 1, check.names = F)
+    health_risk_tmp$gender <- dados[3*(i-1)+2]
+    health_risk_tmp$indicator <- dados[3*(i-1)+3]
+    names(health_risk_tmp)[1] <- "country"
+    
+    health_risk <- bind_rows(health_risk, health_risk_tmp)
+    
+  }
+  
+}
+
+rm(health_risk_tmp)
+
+health_risk <- gather(health_risk, "year", "value", 2:30)
+health_risk$gender <- factor(health_risk$gender)
+health_risk$indicator <- factor(health_risk$indicator)
 ```
