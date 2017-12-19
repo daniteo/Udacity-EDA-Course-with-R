@@ -81,7 +81,9 @@ ggplot(aes(y=price/carat, x=cut, color=color), data=diamonds)+
 
 ```
 
-## 
+## Health Risk Dataset
+
+### Preparing dataframe
 
 ```{r}
 require(xlsx)
@@ -135,4 +137,13 @@ rm(health_risk_tmp)
 health_risk <- gather(health_risk, "year", "value", 2:30)
 health_risk$gender <- factor(health_risk$gender)
 health_risk$indicator <- factor(health_risk$indicator)
+```
+
+### Plots
+
+```{r}
+ggplot(aes(x=year, y=value, color=gender), 
+       data=subset(health_risk, indicator == "SBP"))+
+  geom_point()+
+  facet_wrap( ~indicator, nrow=3)
 ```
