@@ -86,7 +86,7 @@ ggplot(aes(y=price/carat, x=cut, color=color), data=diamonds)+
 ### Preparing dataframe
 
 ```{r}
-require(xlsx)
+library(xlsx)
 library('tidyr')
 library('dplyr')
 
@@ -146,4 +146,100 @@ ggplot(aes(x=year, y=value, color=gender),
        data=subset(health_risk, indicator == "SBP"))+
   geom_point()+
   facet_wrap( ~indicator, nrow=3)
+```
+
+```{r}
+library('dplyr')
+library('tidyr')
+library(ggplot2)
+
+water <- read.csv('urban_water.csv', check.names = FALSE)
+water$local <- 'urban'
+names(water)[1] <- "country"
+water_tmp <- read.csv('rural_water.csv', check.names = FALSE)
+water_tmp$local <- 'rural'
+names(water_tmp)[1] <- "country"
+
+water <- bind_rows(water, water_tmp)
+
+rm(water_tmp)
+
+names(water)
+
+water <- gather(water, "year", "value", 2:22)
+water <- subset(water, !is.na(value))
+
+water$local <- factor(water$local)
+water$year <- as.numeric(water$year)
+
+water$continent <- NA
+
+
+europe = c("Norway", "France", "Portugal", "Finland", "Germany", 
+           "Denmark", "Spain", "Ireland", "Iceland", "Switzerland",
+           "Netherlands", "Ukraine", "Sweden", "Russia", "United Kingdom",
+           "Slovenia", "Hungary", "Romania", "Austria", "Albania", "Italy",
+           "Belgium", "Bulgaria", "Luxembourg", "Greece", "Croatia",
+           "Czech Republic", "Motenegro", "Malta", "Lithuania", "Liechtenstein",
+           "Poland", "Slovak Republic", "Moldova", "Turkey", "Latvia",
+           "Serbia", "Armenia", "Estonia", "Montenegro", "Macedonia, FYR",
+           "Bosnia and Herzegovina", "Belarus", "Georgia","Andorra","Monaco","San Marino","Holy See")
+water$continent <- ifelse(water$country %in% europe, "Europe", water$continent)
+
+africa = c("Niger", "Mozambique", "Congo, Rep.", "Ghana", "Sudan",
+           "South Africa", "Madagascar", "Angola", "Algeria", "Uganda",
+           "Rwanda", "Sierra Leone", "Ethiopia", "Central African Republic",
+           "Burkina Faso", "Zimbabwe", "Chad", "Liberia", "Burundi",
+           "Cote d'Ivoire", "Guinea-Bissau", "Guinea", "Malawi", "Tanzania",
+           "Mali","Senegal", "Togo", "Morocco", "Cameroon", "Cape Verde",
+           "Botswana", "Benin", "Congo, Dem. Rep.", "Egypt", "Gabon",
+           "Mauritania", "Zambia", "Tunisia", "Kenya", "Cambodia",
+           "Nigeria", "Comoros", "Eritrea", "Mauritius", "Seychelles",
+           "Gambia","Lesotho","Libya", "Sao Tome and Principe","Swaziland",
+           "Djibouti","Equatorial Guinea", "Somalia","Ghana")
+water$continent <- ifelse(water$country %in% africa, "Africa", water$continent)
+
+southamerica = c("Brazil", "Argentina", "Uruguay", "Chile", "Bolivia",
+                 "Paraguay", "Venezuela", "Peru", "Colombia", "Guyana",
+                 "Ecuador", "Suriname")
+water$continent <- ifelse(water$country %in% southamerica, "South America", water$continent)
+
+northamerica = c("United States", "Canada", "Greenland")
+water$continent <- ifelse(water$country %in% northamerica, "North America", water$continent)
+
+asia = c("Japan", "China", "Thailand", "India", "Bangladesh",
+         "Saudi Arabia", "Afghanistan", "Qatar", "South Korea", "Bahrain",
+         "Iran", "Israel", "Brunei", "Philippines", "Syria",
+         "Mongolia", "Namibia", "Pakistan", "Lao", "Maldives",
+         "Iraq", "Yemen", "Sri Lanka", "United Arab Emirates", "Tajikistan",
+         "Lebanon", "Jordan", "Kuwait", "Oman", "Singapore",
+         "Hong Kong, China", "Malaysia", "Nepal", "Vietnam", "Indonesia",
+         "Myanmar", "Cyprus", "Timor-Leste", "Uzbekistan", "Turkmenistan",
+         "Kyrgyz Republic", "Kazakhstan", "Bhutan", "Azerbaijan", "Macao, China")
+water$continent <- ifelse(water$country %in% asia, "Asia", water$continent)
+
+centralamerica = c("Honduras", "Costa Rica", "Mexico", "Panama", "Bahamas",
+                   "Haiti", "Jamaica", "Cuba", "Dominican Republic", "Belize",
+                   "El Salvador", "Guatemala", "Barbados", "Dominica", 
+                   "Trinidad and Tobago","Nicaragua","Antigua and Barbuda",
+                   "St. Vincent and the Grenadines","St. Kitts and Nevis",
+                   "St. Lucia", "Grenada","Bermuda","Aruba")
+water$continent <- ifelse(water$country %in% centralamerica, "Central America", water$continent)
+
+oceania = c("Australia", "New Zealand", "Fiji", "Tonga", "Palau",
+            "Solomon Islands", "Palau", "Samoa", 
+            "Papua New Guinea", "Micronesia, Fed. Sts.",
+            "Vanuatu", "Kiribati")
+water$continent <- ifelse(water$country %in% oceania, "Oceania", water$continent)
+
+ggplot(aes(x=year, y=value, color = continent), data=water)+
+  geom_line(stat = 'summary', fun.y = 'mean')+
+  facet_wrap( ~local ) 
+
+ggplot(aes(x=year, y=value, color = local), data=water)+
+  geom_jitter()+
+  facet_wrap( ~continent )
+
+ggplot(aes(x=local, y=value, color = continent), data=water)+
+  geom_jitter()
 ```
