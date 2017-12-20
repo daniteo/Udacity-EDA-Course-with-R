@@ -241,8 +241,8 @@ water$continent <- ifelse(water$country %in% oceania, "Oceania", water$continent
 ```{r}
 ggplot(aes(x=year, y=value, color = continent), 
        data=subset(water, !is.na(water$continent)))+
-  geom_line(stat = 'summary', fun.y = 'min')+
-  facet_wrap( ~local ) 
+  geom_line(stat = 'summary', fun.y = 'mean')+
+  facet_wrap( ~local, nrow = 2 ) 
 ```
 
 ```{r}
@@ -252,6 +252,23 @@ ggplot(aes(x=year, y=value, color = local), data=water)+
 ```
 
 ```{r}
-ggplot(aes(x=local, y=value, color = continent), data=water)+
-  geom_jitter()
+ggplot(aes(x=continent, y=value, color=continent), 
+       data=subset(water, !is.na(continent)))+
+  geom_jitter()+
+  facet_grid( ~local )
+```
+
+```{r}
+library(gganimate)
+ggplot(aes(x = value, fill = local), 
+       data = subset(water, !is.na(continent)))+
+  geom_histogram(bins=10)+
+  scale_x_continuous(limits = c(0,100), breaks = seq(0, 100, 25))+
+  scale_y_continuous(limits = c(0, 50))+
+  facet_wrap( ~year )
+```
+```{r}
+ggplot(aes(x = continent), 
+       data = water)+
+  geom_bar()+
 ```
