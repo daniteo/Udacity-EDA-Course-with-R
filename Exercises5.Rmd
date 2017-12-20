@@ -5,6 +5,8 @@
 ### Diamonds price histogram by color
 
 ```{r}
+library('dplyr')
+library('tidyr')
 library(ggplot2)
 
 data(diamonds)
@@ -148,10 +150,11 @@ ggplot(aes(x=year, y=value, color=gender),
   facet_wrap( ~indicator, nrow=3)
 ```
 
+## Water use dataset
+
+### Preparing data
+
 ```{r}
-library('dplyr')
-library('tidyr')
-library(ggplot2)
 
 water <- read.csv('urban_water.csv', check.names = FALSE)
 water$local <- 'urban'
@@ -207,7 +210,7 @@ water$continent <- ifelse(water$country %in% southamerica, "South America", wate
 northamerica = c("United States", "Canada", "Greenland")
 water$continent <- ifelse(water$country %in% northamerica, "North America", water$continent)
 
-asia = c("Japan", "China", "Thailand", "India", "Bangladesh",
+asia = c("Japan", "China", "Thailand", "India", "Bangladesh", "North Korea",
          "Saudi Arabia", "Afghanistan", "Qatar", "South Korea", "Bahrain",
          "Iran", "Israel", "Brunei", "Philippines", "Syria",
          "Mongolia", "Namibia", "Pakistan", "Lao", "Maldives",
@@ -231,15 +234,24 @@ oceania = c("Australia", "New Zealand", "Fiji", "Tonga", "Palau",
             "Papua New Guinea", "Micronesia, Fed. Sts.",
             "Vanuatu", "Kiribati")
 water$continent <- ifelse(water$country %in% oceania, "Oceania", water$continent)
+```
 
-ggplot(aes(x=year, y=value, color = continent), data=water)+
-  geom_line(stat = 'summary', fun.y = 'mean')+
+### Plots
+
+```{r}
+ggplot(aes(x=year, y=value, color = continent), 
+       data=subset(water, !is.na(water$continent)))+
+  geom_line(stat = 'summary', fun.y = 'min')+
   facet_wrap( ~local ) 
+```
 
+```{r}
 ggplot(aes(x=year, y=value, color = local), data=water)+
   geom_jitter()+
   facet_wrap( ~continent )
+```
 
+```{r}
 ggplot(aes(x=local, y=value, color = continent), data=water)+
   geom_jitter()
 ```
